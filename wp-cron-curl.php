@@ -13,7 +13,7 @@ License: GPLv2 or later
 function wcc_add_every_minute( $schedules ) {
  
     $schedules['every_minute'] = array(
-            'interval'  => 10,
+            'interval'  => 60,
             'display'   => __( 'Every Minute', 'wp-cron-curl' )
     );
      
@@ -29,7 +29,7 @@ function wcc_activation() {
 register_activation_hook( __FILE__, 'wcc_activation' );
 
 function wcc_do_symbiostock_processor() {
-	wcc_curl_get( 'https://stockshop.angiemakes.com/?c=1&ss_c=e5f112c6238b6d99e22b' );
+	wcc_remote_post( 'https://stockshop.angiemakes.com/?c=1&ss_c=e5f112c6238b6d99e22b' );
 }
 add_action( 'wcc_symbiostock_processor_event', 'wcc_do_symbiostock_processor' );
 
@@ -38,27 +38,19 @@ function wcc_deactivation() {
 }
 register_deactivation_hook( __FILE__, 'wcc_deactivation' );
 
-/**
-* Send a GET requst using cURL
-* @param string $url to request
-* @param array $get values to send
-* @param array $options for cURL
-* @return string
-*/
-function wcc_curl_get( $url, array $options = array() ) {   
-    $defaults = array(
-        CURLOPT_URL => $url,
-        CURLOPT_HEADER => 0,
-        CURLOPT_RETURNTRANSFER => TRUE,
-        CURLOPT_TIMEOUT => 4
-    );
-   
-    $ch = curl_init();
-    curl_setopt_array($ch, ($options + $defaults));
-    if( ! $result = curl_exec($ch)) {
-        trigger_error(curl_error($ch));
-    }
-    curl_close($ch);
+function wcc_remote_post( $url ) {   
+	$args = array(
+		'timeout' => 15,
+	);
+	$request = wp_remote_post( $url, $args );
 
-    return $result;
+	if ( is_wp_error($request) ) {
+		return false;
+	} else {
+		$res = maybe_unserialize( wp_remote_retrieve_body( $request ) );
+		if ( ! is_object( $res ) && ! is_array( $res ) )
+			return false;
+	}
+
+	return true;
 }
