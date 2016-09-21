@@ -40,7 +40,7 @@ register_deactivation_hook( __FILE__, 'wcc_deactivation' );
 
 function wcc_remote_post( $url ) {   
 	$args = array(
-		'timeout' => 15,
+		'timeout' => 55,
 	);
 	$request = wp_remote_post( $url, $args );
 
