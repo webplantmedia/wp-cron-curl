@@ -5,7 +5,7 @@ Plugin URI: http://angiemakes.com/
 Description: Cron Curl For Symbiostock
 Author: Chris Baldelomar
 Author URI: http://webplantmedia.com/
-Version: 1.0
+Version: 1.1
 License: GPLv2 or later
 */
 
